@@ -7,6 +7,7 @@ local test = objects:extend()
 test.name = "test"  
 
 function test:new()
+    self.super.new(self)
 end
 
 function test:update(dt)
@@ -26,6 +27,7 @@ local testExtend = test:extend()
 testExtend.name = "testExtend"
 
 function testExtend:new()
+    self.super.new(self)
 end
 
 function testExtend:update(dt)
@@ -35,9 +37,3 @@ end
 function testExtend:draw()
     love.graphics.circle("line", 400, 300, 70)
 end
-
--- 导出类以供外部使用
-return {
-    test = test,
-    testExtend = testExtend,
-}

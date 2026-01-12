@@ -1,10 +1,10 @@
 require "libraries.classic.classic"
 require "objects"
-obj = require "objects" -- 引入 objects.lua 文件
+--obj = require "objects" -- 引入 objects.lua 文件
 
 function love.load() --初始化函数
-    testInstance = obj.test()  -- 创建类的实例
-    testInstanceExtend  = obj.testExtend()
+    testInstance = test()  -- 创建类的实例
+    testInstanceExtend  =testExtend()
 end
 
 function love.update(dt)  --更新函数
