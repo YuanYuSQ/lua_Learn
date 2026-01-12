@@ -1,39 +1,39 @@
 
-local objects = require "libraries.classic.classic"
+ objects = require "libraries.classic.classic"
 
 -- 创建类
-local test = objects:extend()
+trackFade = objects:extend()--创建一个跟着鼠标的同心圆
 
-test.name = "test"  
+function trackFade:new()
 
-function test:new()
-    self.super.new(self)
 end
 
-function test:update(dt)
-    self.super.update(self, dt)
+function trackFade:update(dt)
+    trackFade.px=love.mouse.getX()
+    trackFade.py=love.mouse.getY()
 end
 
-function test:draw()
-    love.graphics.circle("fill", 400, 300, 50)
+function trackFade:new()
+    self.px = love.mouse.getX()
+    self.py = love.mouse.getY()
+    self.followSpeed = 8
+end
+
+function trackFade:update(dt)
+    local mx = love.mouse.getX()
+    local my = love.mouse.getY()
+    local s = self.followSpeed or 8
+    self.px = self.px + (mx - self.px) * s * dt
+    self.py = self.py + (my - self.py) * s * dt
+end
+
+function trackFade:draw()
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.circle("fill", self.px, self.py, 50)
+    love.graphics.setColor(1, 0, 0)
+    love.graphics.circle("line", self.px, self.py, 70, 25,15)
 end
 
 
 
---testInstance = test()  -- 创建类的实例
 
-local testExtend = test:extend()
-
-testExtend.name = "testExtend"
-
-function testExtend:new()
-    self.super.new(self)
-end
-
-function testExtend:update(dt)
-    self.super.update(self, dt)
-end
-
-function testExtend:draw()
-    love.graphics.circle("line", 400, 300, 70)
-end

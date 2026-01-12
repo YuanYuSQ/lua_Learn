@@ -12,6 +12,7 @@ function love.update(dt)  --更新函数
 end
 
 function love.draw()   --绘制函数
+    print(testInstance.name, 100, 100)
     testInstance:draw()
     testInstanceExtend:draw()
 end
