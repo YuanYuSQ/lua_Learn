@@ -1,0 +1,24 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Love2D Project", // 任务名称（可自定义）
+            "type": "shell",
+            // 👇 替换为你的系统对应的命令
+            "command":"\"E:\\rj\\tool\\LOVE\\lovec.exe\" .", 
+            
+            "args": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true // 设置为默认任务，按Ctrl+Shift+B直接运行
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always", // 运行时自动显示终端
+                "focus": false, // 不聚焦终端（保持游戏窗口焦点）
+                "panel": "shared" // 复用终端面板
+            },
+            "problemMatcher": []
+        }
+    ]
+}
