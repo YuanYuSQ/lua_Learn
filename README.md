@@ -1,11 +1,9 @@
 # 研究lua和love2d引擎
 
----
 [参考教程](https://github.com/a327ex/boipushy#)SNKRX的前身教程,包括lua,love2d
 
 ## 日志
 
----
 ##### 2026/1/12  
 熟悉lua的面向编程,lua里没有内置的类,需要用表和函数实现,这里的oop是第三方的库[rxi/classic](https://github.com/rxi/classic)
 用法
