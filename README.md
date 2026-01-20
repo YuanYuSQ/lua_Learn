@@ -1,6 +1,6 @@
 # 研究lua和love2d引擎
 
-[参考教程](https://github.com/a327ex/boipushy#)SNKRX的前身教程,包括lua,love2d
+SNKRX的[前身教程](https://github.com/a327ex/boipushy#),教程包括lua,love2d
 
 ## 日志
 
@@ -41,11 +41,12 @@ timer:tween(0.1 * self.speed, self, { rectside = { x = self.faderectside.x } }, 
 
 ---
 ##### 2026/1/18
-研究comfyUI,和HugginggFace,终端一直在报错   `= =` 整天都在面對CMD和PSL
+研究comfyUI,和HugginggFace,终端一直在报错`= =` 整天都在面對CMD和PSL
 
 ---
 ##### 2026/1/20
 - 重构了`HPrect`
+
  ```lua
  ocal HpRect = class:extend()
 
@@ -105,7 +106,7 @@ end
  ```
 
 
-- 新增了`input`类([网址](https://github.com/a327ex/boipushy#)),可以直接在`update()`执行交互逻辑了
+- 新增了`input`[类](https://github.com/a327ex/boipushy#),可以直接在`update()`执行交互逻辑了
 
  `input`使用前需要先绑定按键,按键可以绑定动作
 
@@ -133,3 +134,5 @@ end
 - 更新 TODO 列表以追踪分析与验证步骤。
 
 运行 Love2D 项目并按 `q` 或点击快速触发 `hurt()`，观察 `rectside.x` 为负。
+
+---
