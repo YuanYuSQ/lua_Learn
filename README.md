@@ -1,4 +1,4 @@
-# 研究lua和love2d引擎
+# lua和love2d引擎
 
 SNKRX的[前身教程](https://github.com/a327ex/boipushy#),教程包括lua,love2d
 
