@@ -41,7 +41,7 @@ timer:tween(0.1 * self.speed, self, { rectside = { x = self.faderectside.x } }, 
 
 ---
 ##### 2026/1/18
-研究comfyUI,和HugginggFace,终端一直在报错`= =` 整天都在面對CMD和PSL
+研究comfyUI,和怎么在HugginggFace下模型,终端一直在报错`= =` 整天都在面對CMD，PSL，WSL，该死的wsl，各种依赖一直报错，但我还是很喜欢Linux，命令行其实也挺好用的
 
 ---
 ##### 2026/1/20
@@ -130,10 +130,7 @@ end
 
 
 
-- 在 `objects.lua` 中：给 `HpRect:hurt` 增加宽度非负约束（clamp），并在 tween 回调处再次强制 non-negative，防止在短时间内多次调用导致 `rectside.x < 0`。
-- 更新 TODO 列表以追踪分析与验证步骤。
-
-运行 Love2D 项目并按 `q` 或点击快速触发 `hurt()`，观察 `rectside.x` 为负。
+- 在 `objects.lua` 中：给 `HpRect:hurt` 增加宽度非负约束（clamp），并在 tween 回调处再次强制 non-negative，防止在短时间内多次调用导致 `rectside.x < 0`，但运行 Love2D 项目并按 `q` 或点击快速触发 `hurt()`， `rectside.x` 为负。
 
 ---
 ##### 2026/1/20
@@ -149,7 +146,7 @@ end
 
 
 ---
-#### 20206/1/21
+#### 2026/1/21
 偶然看到终端美化,搞了3,4个小时在美化上, `= =` ,好看总是第一生产力
 
 - 美化前
