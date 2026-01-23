@@ -3,20 +3,44 @@ class = require "libraries.classic.classic"
 local room = class:extend() 
 room.name = nil
 room.type = nil
-room.side=nil
+room.side = nil
 
-function room:new(name, type, side)
+-- args 是可变参数列表
+function room:new(name, args)
     self.name = name or "default_room"
-    self.type = type or "normal"
-    self.side=side or 3
+
+
+    if args then -- 可变参数赋值
+        for index, value in pairs(args) do
+            self[index] = value
+        end
+    end
 end
 
 function room:update(dt)
     
 end
+function room:draw()
+    
+end
+--- 激活房间
+function room:active()
+    print("Room "..self.name.." is now active.")
+    self.active = true
+end
 
+--- 取消激活
+function room:deactive()
+    print("Room "..self.name.." is now deactive.")
+    self.active = false
+end
+
+--测试用 绘制形状
 function room:drawShape(mode,side, x, y)
     self.side=side or self.side
+    if not self.side then
+        return
+    end
     love.graphics.setColor(1, 1, 1)
     if type(side)=="string" then
         side=side
@@ -55,7 +79,6 @@ function room:drawShape(mode,side, x, y)
     end
 end
 local Text= class:extend()
-
 
 return{room=room, Text=Text}
 
