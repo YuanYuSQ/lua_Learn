@@ -86,7 +86,7 @@ timer:every(dlay,func,count)   --(延迟dlay秒后执行,执行的匿名函数,�
 - `tween`
 
  ```lua
-
+timer.tween(duration, subject, target, method, after, ...)
 ```
 
 - `during`
@@ -97,10 +97,25 @@ Timer.during(delay, func, after)
 ```lua
 timer.script(func)
 ```
-- `script`
+- `new`
 ```lua
-
+timer.new()
 ```
+- `cancel`
+```lua
+timer.cancel(handle)
+```
+- `clear`
+```lua
+timer.clear()
+```
+- `update`
+```lua
+timer.update(dt)
+```
+
+
+
 
 
 ---
