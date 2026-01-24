@@ -74,11 +74,13 @@ end
 另外hump的timer类并不支持在`timer:xxx(num,function() end,num)`里面直接调用具名(显性申明)函数,但能通过匿名函数调用具名函数,强行调用也回出现重复调用的bug
 
 - `after`
+
 ```lua
 timer:after(delay,func)   --(延迟dlay秒后执行,执行的匿名函数)
 ```
 
 - `every`
+
 ```lua
 timer:every(dlay,func,count)   --(延迟dlay秒后执行,执行的匿名函数,执行延迟次数)
 ```
@@ -90,37 +92,45 @@ timer.tween(duration, subject, target, method, after, ...)
 ```
 
 - `during`
+
 ```lua
 Timer.during(delay, func, after)
 ```
+
 - `script`
+
 ```lua
 timer.script(func)
 ```
+
 - `new`
+
 ```lua
 timer.new()
 ```
+
 - `cancel`
+
 ```lua
 timer.cancel(handle)
 ```
+
 - `clear`
+
 ```lua
 timer.clear()
 ```
+
 - `update`
+
 ```lua
 timer.update(dt)
 ```
 
-
-
-
-
 ---
 
 ##### 2026/1/18
+
 研究comfyUI,和怎么在HugginggFace下模型,终端一直在报错`= =` 整天都在面對CMD，PSL，WSL，该死的wsl，各种依赖一直报错，但我还是很喜欢Linux，命令行其实也挺好用的
 
 ---
@@ -209,8 +219,6 @@ function love.update(dt)
 end
 ```
 
-
-
 - 在 `objects.lua` 中：给 `HpRect:hurt` 增加宽度非负约束（clamp），并在 tween 回调处再次强制 non-negative，防止在短时间内多次调用导致 `rectside.x < 0`，但运行 Love2D 项目并按 `q` 或点击快速触发 `hurt()`， `rectside.x` 为负。
 
 ---
@@ -226,7 +234,9 @@ end
 欠着 24号补
 
 ---
+
 #### 2026/1/21
+
 偶然看到终端美化,搞了3,4个小时在美化上, `= =` ,好看总是第一生产力
 
 - 美化前
@@ -234,17 +244,20 @@ end
 
 - 美化后
 ![美化后](README_ASSET/cmd2.0.png)
-美化后
+- 精简版
+
+![精简版](README_ASSET/cmd3.0.png)
 
 美化教程 暂定24号补
 
 ---
 
+#### 2026/1/22
 
-####  2026/1/22
 room和area的实际运用
 
 - room
+
  ```lua
 class = require "libraries.classic.classic"
 
@@ -271,14 +284,17 @@ function room:drawShape(mode,side, x, y)
     ...
 end
  ```
+
 `args`在这里实际上是一个表,可以批处理参数
 
-24号补 
+24号补
 
 ---
 
 #### 2026/1/23
+
 重构`room`类,实现`room`持久化,增加`gotoRoom()`,`addRoom()`,`room`状态检测等
+
 ```lua
 
 --- 激活房间

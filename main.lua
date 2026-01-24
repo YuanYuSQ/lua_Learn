@@ -7,7 +7,6 @@ game = require "game"
 function love.load()
     input = Input()
     timer = Timer()
-    time=timer:new()
     room = game.room
     rooms = {}
     current_room = nil
@@ -21,7 +20,10 @@ function love.load()
     current_room = rooms["block_room"]
     current_room:active()
     timer:after(1, function() print("One second has passed!") end)
-       timer:every(5, printTime)
+       timer:every(5, printTime )
+
+
+   
 end
 
 function addRoom(room_type, room_name, args)
@@ -55,9 +57,7 @@ end
 
 function love.update(dt)
     timer:update(dt)
-    
-    time:update(dt)
-    
+
 
 
     if input:pressed("select CircleRoom") then
