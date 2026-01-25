@@ -1,13 +1,12 @@
-require "libraries.classic.classic"
-class = require "objects"
+class = require "libraries.classic.classic"
 Timer = require "libraries.hump.timer"
 Input = require "libraries.input.Input"
-game = require "game"
+Room= require "objects/room"
 --obj = require "objects" -- 引入 objects.lua 文件
 function love.load()
     input = Input()
     timer = Timer()
-    room = game.room
+    room = Room.room
     rooms = {}
     current_room = nil
     addRoom("room", "block_room")
@@ -21,7 +20,7 @@ function love.load()
     current_room:active()
     timer:after(1, function() print("One second has passed!") end)
        timer:every(5, printTime )
-
+    
 
    
 end

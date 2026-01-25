@@ -77,6 +77,7 @@ end
 
 ```lua
 timer:after(delay,func)   --(延迟dlay秒后执行,执行的匿名函数)
+
 ```
 
 - `every`
@@ -85,11 +86,19 @@ timer:after(delay,func)   --(延迟dlay秒后执行,执行的匿名函数)
 timer:every(dlay,func,count)   --(延迟dlay秒后执行,执行的匿名函数,执行延迟次数)
 ```
 
-- `tween`
+
+- `tween` 补间动画
+
+hump.timer 提供了两种补间动画接口：底层接口 `Timer.during()`和高级接口 `Timer.tween()`
 
  ```lua
 timer.tween(duration, subject, target, method, after, ...)
 ```
+
+有多种补间模式`linear`, `quad`, `cubic`, `quart`, `quint`, `sine`, `expo`, `circ`, `back`, `bounce`, 和 `elastic`.
+
+可以自定义插值方法,[详情见官方文档](https://hump.readthedocs.io/en/latest/timer.html#Timer.cancel)
+
 
 - `during`
 
@@ -97,28 +106,63 @@ timer.tween(duration, subject, target, method, after, ...)
 Timer.during(delay, func, after)
 ```
 
+
 - `script`
 
 ```lua
-timer.script(func)
+timer.script(func) --传入的方法,内置的仅有wait
+
+timer:script(function(wait)
+        while true do
+            print("This message appears every 3 seconds.")
+            wait(3)
+        end
+    end)
 ```
 
-- `new`
+每三秒输出
+
+
+
+- `new` 创建新计时器
 
 ```lua
 timer.new()
 ```
+适用于挂载在敌人等实体
 
-- `cancel`
+
+- `cancel`  取消计时器实例
 
 ```lua
 timer.cancel(handle)
+
+
+function tick()
+    print('tick... tock...')
+end
+handle = Timer.every(1, tick)
+-- later
+Timer.cancel(handle) -- 不是: Timer.cancel(tick)
+
+
+-- using a timer instance
+function tick()
+    print('tick... tock...')
+end
+handle = menuTimer:every(1, tick)
+-- later
+menuTimer:cancel(handle)
+
 ```
 
-- `clear`
+
+- `clear`  移除所有定时和周期性函数。尚未执行的函数将被丢弃。
 
 ```lua
-timer.clear()
+Timer.clear()
+
+menuTimer:clear()
 ```
 
 - `update`
@@ -126,6 +170,7 @@ timer.clear()
 ```lua
 timer.update(dt)
 ```
+更新计时器并在达到截止时间时执行函数。在 love.update(dt) 中调用
 
 ---
 
@@ -248,7 +293,6 @@ end
 
 ![精简版](README_ASSET/cmd3.0.png)
 
-美化教程 暂定24号补
 
 ---
 
@@ -287,7 +331,21 @@ end
 
 `args`在这里实际上是一个表,可以批处理参数
 
-24号补
+```lua
+for index, value in pairs(args) do
+        -- 如果当前参数是表，就合并到 room_opts 中
+        if type(value) == "table" then
+            for k, v in pairs(value) do
+                room_opts[k] = v
+            end
+         else
+            -- 如果是普通值，按索引存起来（比如额外参数）
+            room_opts["arg_" .. index] = value
+        end
+    end
+```
+
+lua内置遍历表的方法,`ipairs()`和`pairs()`,核心区别`ipairs()`适用于有序数数组类似py里的数组,`pairs()`不管键是什么类型,全部遍历但无序
 
 ---
 
@@ -296,7 +354,7 @@ end
 重构`room`类,实现`room`持久化,增加`gotoRoom()`,`addRoom()`,`room`状态检测等
 
 ```lua
-
+-- objects/room.lua
 --- 激活房间
 function room:active()
     print("Room "..self.name.." is now active.")
@@ -310,4 +368,58 @@ function room:deactive()
 end
 ```
 
-24号补 ...
+
+```lua
+-- main.lua
+love.load()
+
+rooms={}
+current_room=nil
+--定义初始房间
+deful_room = room:addRoom("room","deful_room",{leve=0,test = true})
+current_room =deful_room
+
+end
+love.update(dt)
+current_room
+end
+
+function addRoom(room_type, room_name, args)
+    rooms[room_name] = _G[room_type](room_name, args)
+    print("Added room: " .. room_name)
+    print(rooms[room_name].name, rooms[room_name].type, rooms[room_name].side)
+    return rooms[room_name] --返回room便于直接修改,不用再去rooms表里找
+end
+
+function gotoRoom(room_type, room_name, args)
+    print("Switching to room: " .. room_name)
+
+    if current_room and rooms[room_name] then
+        print(room_name .. " is now active.")
+        if current_room.deactive then
+            current_room:deactive()
+        end
+        current_room = rooms[room_name]
+        if current_room.active then
+            current_room:active()
+        end
+    else
+        current_room = addRoom(room_type, room_name, args)
+        print("Created and switched to new room: " .. current_room.name)
+    end
+end
+
+```
+
+通过`addRoom()`添加房间到`rooms`,用`gotoRoom()`切换房间,`active()`与`deactive()`控制切换后启用当前房间,停用后台房间
+
+---
+
+#### 2026/1/24
+
+补清前几天的日志
+
+
+---
+
+#### 2026/1/25

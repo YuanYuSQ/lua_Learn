@@ -1,0 +1,1 @@
+class = require "libraries.classic.classic"
