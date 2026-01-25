@@ -184,11 +184,12 @@ timer.update(dt)
 
 - 重构了`HPrect`
 
--- # region
+
  ```lua
  ocal HpRect = class:extend()
 
 function HpRect:new(rectsidemax, maxhp, minhp, pos, hpcolor, bkcolor, speed)
+-- # region
     self.maxhp = maxhp or 100
     self.minhp = minhp or 0
     self.currenthp = self.maxhp
@@ -201,7 +202,7 @@ function HpRect:new(rectsidemax, maxhp, minhp, pos, hpcolor, bkcolor, speed)
     self.pos = pos or { x = 100, y = 100 }
     self.speed = speed or 3                                          --血量动画速度
     self.faderectside = { x = self.rectside.x, y = self.rectside.y } --缓冲血量
-    
+    -- # endregion
 end
 
 --扣血实现,在main.lua中调用,例如：hpRect:hurt(10) 表示扣10点血
@@ -243,7 +244,7 @@ function HpRect:draw(x, y)
     end
 end 
 ```
--- # region
+
 
 
 
