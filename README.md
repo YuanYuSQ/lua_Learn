@@ -184,8 +184,7 @@ timer.update(dt)
 
 - 重构了`HPrect`
 
-<details>
-<summary>点击展开：完整的 Lua Timer 代码</summary>
+-- # region
  ```lua
  ocal HpRect = class:extend()
 
@@ -202,6 +201,7 @@ function HpRect:new(rectsidemax, maxhp, minhp, pos, hpcolor, bkcolor, speed)
     self.pos = pos or { x = 100, y = 100 }
     self.speed = speed or 3                                          --血量动画速度
     self.faderectside = { x = self.rectside.x, y = self.rectside.y } --缓冲血量
+    
 end
 
 --扣血实现,在main.lua中调用,例如：hpRect:hurt(10) 表示扣10点血
@@ -242,8 +242,8 @@ function HpRect:draw(x, y)
         love.graphics.rectangle("fill", x, y, self.rectside.x, self.rectside.y)     --血量
     end
 end 
-</details>
 ```
+-- # region
 
 
 
