@@ -184,6 +184,8 @@ timer.update(dt)
 
 - 重构了`HPrect`
 
+<details>
+<summary>点击展开：完整的 Lua Timer 代码</summary>
  ```lua
  ocal HpRect = class:extend()
 
@@ -239,8 +241,11 @@ function HpRect:draw(x, y)
         love.graphics.setColor(self.hpcolor)
         love.graphics.rectangle("fill", x, y, self.rectside.x, self.rectside.y)     --血量
     end
-end
- ```
+end 
+</details>
+```
+
+
 
 - 新增了`input`[类](https://github.com/a327ex/boipushy#),可以直接在`update()`执行交互逻辑了
 
@@ -345,6 +350,13 @@ for index, value in pairs(args) do
     end
 ```
 
+```lua
+function GameObject:new(area, x, y, opts)
+    local opts = opts or {}
+    if opts then for k, v in pairs(opts) do self[k] = v end end  --精简版 opts=args
+end
+```
+
 lua内置遍历表的方法,`ipairs()`和`pairs()`,核心区别`ipairs()`适用于有序数数组类似py里的数组,`pairs()`不管键是什么类型,全部遍历但无序
 
 ---
@@ -423,3 +435,34 @@ end
 ---
 
 #### 2026/1/25
+游戏对象基类,所有对象都从此继承
+```lua
+--onjects/gameObject
+function GameObject:new(area, x, y, opts)
+    local opts = opts or {}
+    if opts then for k, v in pairs(opts) do self[k] = v end end
+
+    self.area = area
+    self.x, self.y = x, y
+    self.id = uuid()
+    self.dead = false
+    self.timer = Timer()
+end
+
+function GameObject:update(dt)
+    if self.timer then self.timer:update(dt) end
+end
+
+function GameObject:draw()
+
+end
+
+function uuid()
+  local fn = function(x)
+    local r = math.random(16) - 1
+    r = (x == "x") and (r + 1) or (r % 4) + 9
+    return ("0123456789abcdef"):sub(r, r)
+  end
+  return (("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"):gsub("[xy]", fn))
+end
+```
