@@ -621,7 +621,7 @@ function random(min, max)
 end
 ```
 <video 
-  src="README_ASSET/compressO-圆形转场2.0.mp4"  
+  src="https://github.com/YuanYuSQ/lua_Learn/tree/main/README_ASSET/compressO-圆形转场2.0.mp4"  
   width="800"      
   height="450"       
   controls         
