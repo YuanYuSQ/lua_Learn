@@ -1,4 +1,5 @@
 class = require "libraries.classic.classic"
+require "utils.uuid"
 GameObject = class:extend()
 
 function GameObject:new(area, x, y, opts)
@@ -20,11 +21,3 @@ function GameObject:draw()
 
 end
 
-function uuid()
-  local fn = function(x)
-    local r = math.random(16) - 1
-    r = (x == "x") and (r + 1) or (r % 4) + 9
-    return ("0123456789abcdef"):sub(r, r)
-  end
-  return (("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"):gsub("[xy]", fn))
-end

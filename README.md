@@ -4,7 +4,7 @@ SNKRX的[前身教程](https://github.com/a327ex/boipushy#),教程包括lua,love
 
 ## 日志
 
-##### 2026/1/12  
+#### 2026/1/12  
 
 熟悉lua的面向编程,lua里没有内置的类,需要用表和函数实现,这里的oop是第三方的库[rxi/classic](https://github.com/rxi/classic)
 用法
@@ -31,7 +31,7 @@ end
 
 ---
 
-##### 2026/1/14  
+#### 2026/1/14  
 
 练习 `hump.timer` 的 `after` 与 `tween`，写了`HpRect`类。
 
@@ -41,7 +41,7 @@ timer:tween(0.1 * self.speed, self, { rectside = { x = self.faderectside.x } }, 
                 end)
 ```
 
-##### timer
+#### timer
 
 - 这里的[timer](https://hump.readthedocs.io/en/latest/timer.html)是[hump](https://github.com/vrld/hump)其中的一个类,timer内置了许多方法,最常用的有`after`,`tween`,`every`,`during`.
 
@@ -71,7 +71,6 @@ end
 
 这里的`after`将会在过3秒和6秒时随机打印一个数,`every`则会每秒输出一次`已过1秒`总共输出3次,若没有`3`则会一直循环,特别注意不要在持续快速调用的函数内直接使用timer,会出现重复调用的bug,重复次数跟调用次数有关,类似`love.update()`,`love.draw()`
 
-另外hump的timer类并不支持在`timer:xxx(num,function() end,num)`里面直接调用具名(显性申明)函数,但能通过匿名函数调用具名函数,强行调用也回出现重复调用的bug
 
 - `after`
 
@@ -174,13 +173,13 @@ timer.update(dt)
 
 ---
 
-##### 2026/1/18
+#### 2026/1/18
 
 研究comfyUI,和怎么在HugginggFace下模型,终端一直在报错`= =` 整天都在面對CMD，PSL，WSL，该死的wsl，各种依赖一直报错，但我还是很喜欢Linux，命令行其实也挺好用的
 
 ---
 
-##### 2026/1/20
+#### 2026/1/29
 
 - 重构了`HPrect`
 
@@ -252,6 +251,8 @@ end
 
  ```lua
     input:bind("q", "hurt")
+
+    input:bind('move_left', {'a', 'left', 'dpleft', 'm1'}) --后续再改,支持绑定多个按键
  ```
 
 这里将`q`键绑定到`hurt`这个动作,使用时可以直接如上图所示判断`hurt`是否被触发,更易理解,后续将增加自定义绑键
@@ -272,7 +273,7 @@ end
 
 ---
 
-##### 2026/1/20
+#### 2026/1/20
 
 研究游戏的结构性代码,比较抽象,并非实际的应用层函数
 
@@ -465,3 +466,55 @@ function uuid()
   return (("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"):gsub("[xy]", fn))
 end
 ```
+自动读取类文件,love2d更新了接口,原教程使用的`love.filesystem.isFile()`,`love.filesystem.isDirectory(file)`需要替换,以下是更新过的方法
+```lua
+-- main.lua
+love.load()
+local object_files = {}
+    object_files = recursiveEnumerate("objects", object_files)
+    requireFiles(object_files)
+end
+
+function recursiveEnumerate(folder, file_list)  -- 递归枚举文件夹中的所有文件
+    -- 容错：确保 file_list 是有效表（避免传入 nil 导致报错）
+    file_list = file_list or {}
+    -- 容错：确保 folder 路径合法（首尾无多余斜杠）
+    folder = folder:gsub("/+$", "")  
+
+    -- 获取文件夹下的所有项（文件/子文件夹）
+    local items = love.filesystem.getDirectoryItems(folder)
+    for _, item in ipairs(items) do
+        local file_path = folder .. '/' .. item
+
+        -- 核心修改：用 getInfo 获取文件/目录信息（替代过时函数）
+        local file_info = love.filesystem.getInfo(file_path)
+        if not file_info then
+            -- 跳过不存在/无权限的项（增强健壮性）
+            goto continue
+        end
+
+        if file_info.type == "file" then
+            -- 是文件：加入列表
+            table.insert(file_list, file_path)
+        elseif file_info.type == "directory" then
+            -- 是目录：递归枚举
+            recursiveEnumerate(file_path, file_list)
+        end
+
+        ::continue::  -- Lua 标签，用于跳过无效项
+    end
+
+    return file_list  -- 返回结果（方便调用时直接获取）
+end
+
+function requireFiles(files) --批量require文件
+    
+    for _, file in ipairs(files) do
+        local className = file:match("([^/]+)%.lua$")
+        local file = file:sub(1, -5)
+        _G[className] = require(file)  
+    end
+end
+
+```
+
