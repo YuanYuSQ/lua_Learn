@@ -1,8 +1,10 @@
 class = require "libraries.classic.classic"
+Area = require"objects.Area".Area
 local room = class:extend() 
 room.name = nil
 room.type = nil
 room.side = nil
+room.areas = nil
 
 -- args 是可变参数列表
 function room:new(name, args)
@@ -78,4 +80,57 @@ function room:drawShape(mode,side, x, y)
     end
 end
 
-return{room=room}
+
+ 
+Stage = class:extend()
+
+function Stage:new()
+
+    self.area = Area(self)
+     self.timer = Timer()
+    
+end
+
+function Stage:update(dt)
+    self.area:update(dt)
+    self.timer:update(dt)
+end
+
+function Stage:draw()
+    self.area:draw()
+end
+function  Stage:active()
+    self:draw()
+    self.area:active()
+    print("Stage active")
+    self.timer:every(0.005, function()
+        self.area:addGameObject('CircleFade', random(0, 800), random(0, 600))
+         self.area:addGameObject('CircleFade', random(0, 800), random(0, 600))
+          self.area:addGameObject('CircleFade', random(0, 800), random(0, 600))
+          self.area:addGameObject('CircleFade', random(0, 800), random(0, 600))
+    end, 1000)
+  
+
+
+self.timer:after(0.7, function () self.area:addGameObject("CircleFade",wx/2,wy/2,{side = wx})
+    
+end)
+end
+
+function Stage:deactive()
+    self.area:deactive()
+    self.area.game_objects={}
+end
+
+function random(min, max)
+    if not max then -- if max is nil then it means only one value was passed in
+        return love.math.random()*min
+    else
+        if min > max then min, max = max, min end
+        return love.math.random()*(max - min) + min
+    end
+end
+
+
+
+return{room=room,Stage =Stage}

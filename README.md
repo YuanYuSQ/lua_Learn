@@ -518,3 +518,139 @@ end
 
 ```
 
+--- 
+
+#### 2026/1/26 
+
+实现在`room.area`中进行逻辑,制作了简短的场景加载动画,实现在一个房间的区域里生成游戏对象，实现切换房间可选择性留存房间下区域内的游戏对象,视频中的每个圆都是继承自`GameObject`的游戏对象`CiecleFade`,在`Stage`中的`area`动态加载
+
+- `CiecleFade`
+
+```lua
+-- objects/GameObject
+CircleFade = GameObject:extend()
+function CircleFade:new(area, x, y, opts)
+    wx = love.graphics.getWidth()
+    wy = love.graphics.getHeight()
+    self.side = 0
+    self.timer = Timer:new()
+    CircleFade.super.new(self, area, x, y, opts)
+    self:deadLoop()   
+end
+
+--圆形生成参数
+function CircleFade:deadLoop()
+    if self.side == 0 then
+        timer:tween(random(1, 2.5), self, { side = random(20, 35) }, 'in-out-quad', function()
+        timer:after(0.45, function() 
+            timer:tween(2, self, { side = 0 }, 'in-out-quad', function()
+               timer:after(0.1, function() self.dead = true end)
+            end)
+       end)
+    end)
+else
+    self.side = 0
+    timer:tween(5, self, { side = wx*1.2 }, 'in-out-quad', function()
+        timer:tween(0.9,self,{side = 0},'in-out-quad',function ()
+            timer:after(0.1, function() self.dead = true end)
+        end)             
+      end)
+    end
+end
+
+function CircleFade:update(dt)
+    CircleFade.super.update(self, dt)
+    self.timer:update(dt)
+end
+
+function CircleFade:draw()
+    love.graphics.circle("fill", self.x, self.y, self.side)
+end
+```
+- `Satge`
+
+```lua
+-- objects/Room
+Stage = class:extend()
+
+function Stage:new()
+
+    self.area = Area(self)
+     self.timer = Timer()
+    
+end
+
+function Stage:update(dt)
+    self.area:update(dt)
+    self.timer:update(dt)
+end
+
+function Stage:draw()
+    self.area:draw()
+end
+function  Stage:active()
+    self:draw()
+    self.area:active()
+    print("Stage active")
+    self.timer:every(0.005, function()
+        self.area:addGameObject('CircleFade', random(0, 800), random(0, 600))
+         self.area:addGameObject('CircleFade', random(0, 800), random(0, 600))
+          self.area:addGameObject('CircleFade', random(0, 800), random(0, 600))
+          self.area:addGameObject('CircleFade', random(0, 800), random(0, 600))
+    end, 1000)
+  
+
+
+self.timer:after(0.7, function () self.area:addGameObject("CircleFade",wx/2,wy/2,{side = wx})
+    
+end)
+end
+
+function Stage:deactive()
+    self.area:deactive()
+    self.area.game_objects={}
+end
+
+function random(min, max)
+    if not max then -- if max is nil then it means only one value was passed in
+        return love.math.random()*min
+    else
+        if min > max then min, max = max, min end
+        return love.math.random()*(max - min) + min
+    end
+end
+```
+<video controls src="README_ASSET/compressO-圆形转场2.0.mp4" title="Title"></video>
+
+为`Area`添加启用判断,利于持久化`room`
+```lua
+
+function Area:update(dt)
+    --循环采用倒序方式，从列表末尾向开头遍历。这是因为如果在正向遍历 Lua 表时删除元素会导致某些元素被跳过
+    if self.active ==true then
+        self.timer:update(dt)
+    end
+        for i = #self.game_objects, 1, -1 do
+        local game_object = self.game_objects[i]
+        game_object:update(dt)
+        if game_object.dead then table.remove(self.game_objects, i)end
+    end
+end
+
+function Area:draw()
+    for _, game_object in ipairs(self.game_objects) do game_object:draw() end
+end
+
+function Area:active()
+    self.isactive=true
+end
+function Area:deactive()
+     self.isactive=false
+end
+function Area:addGameObject(game_object_type, x, y, opts)
+    local opts = opts or {}
+    local game_object = _G[game_object_type](self, x or 0, y or 0, opts)
+    table.insert(self.game_objects, game_object)
+    return game_object
+end
+```

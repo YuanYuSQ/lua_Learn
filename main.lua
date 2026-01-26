@@ -3,49 +3,44 @@ Timer = require "libraries.hump.timer"
 Input = require "libraries.input.Input"
 --obj = require "objects" -- 引入 objects.lua 文件
 function love.load()
-    love.math.randomseed(os.time()) -- 设置随机种子
+    love.math.setRandomSeed(os.time())  -- 设置随机种子
     --自动加载 objects 文件夹下的所有类
+
+
+    love.window.setMode(800, 600)  -- 可替换为你想要的窗口尺寸
+    
     local object_files = {}
     object_files = recursiveEnumerate("objects", object_files)
     requireFiles(object_files)
+    wx = love.graphics.getWidth()
+    wy = love.graphics.getHeight()
 
+    GameObject = _G["GameObject"] --确保全局可访问GameObject类
     input = Input()
     timer = Timer()
+    area=Area.Area
     room=Room.room
     rooms = {}
     current_room = nil
-    addRoom("room", "block_room")
+    addRoom("Stage", "Stage")
     addRoom("room", "circle_room", { side = "circle" })
     addRoom("room", "square_room", { side = 4 })
     input:bind("f1", "select CircleRoom")
     input:bind("f2", "select SquareRoom")
-    current_room = rooms["block_room"]
-    current_room:active()
+    input:bind("f3","select Stage")
+    current_room = rooms["Stage"]
+ --   current_room:active()
+
 
 end
 
-function addRoom(room_type, room_name, args)
-    rooms[room_name] = _G[room_type](room_name, args)
-    print("Added room: " .. room_name)
-    print(rooms[room_name].name, rooms[room_name].type, rooms[room_name].side)
-    return rooms[room_name] --返回room便于直接修改,不用再去rooms表里找
-end
 
-function gotoRoom(room_type, room_name, args)
-    print("Switching to room: " .. room_name)
-
-    if current_room and rooms[room_name] then
-        print(room_name .. " is now active.")
-        if current_room.deactive then
-            current_room:deactive()
-        end
-        current_room = rooms[room_name]
-        if current_room.active then
-            current_room:active()
-        end
+function random(min, max)
+    if not max then -- if max is nil then it means only one value was passed in
+        return love.math.random() * min
     else
-        current_room = addRoom(room_type, room_name, args)
-        print("Created and switched to new room: " .. current_room.name)
+        if min > max then min, max = max, min end
+        return love.math.random() * (max - min) + min
     end
 end
 
@@ -60,6 +55,10 @@ function love.update(dt)
         gotoRoom("room", "square_room")
     end
 
+     if input:pressed("select Stage") then
+        gotoRoom("Stage", "Stage")
+    end
+
     if current_room then
         current_room:update(dt)
     end
@@ -68,7 +67,7 @@ end
 function love.draw()
     
     if current_room then
-        current_room:drawShape("fill", current_room.side)
+        current_room:draw()
     end
 end
 
@@ -108,12 +107,37 @@ function requireFiles(files) --批量require文件
     
     for _, file in ipairs(files) do
         local className = file:match("([^/]+)%.lua$")
-        print(className)
+      --  print(className)
 
         local file = file:sub(1, -5)
         _G[className] = require(file)
         
          --require(file)
         
+    end
+end
+
+function addRoom(room_type, room_name, args)
+    rooms[room_name] = _G[room_type](room_name, args)
+    print("Added room: " .. room_name)
+    print(rooms[room_name].name, rooms[room_name].type, rooms[room_name].side)
+    return rooms[room_name] --返回room便于直接修改,不用再去rooms表里找
+end
+
+function gotoRoom(room_type, room_name, args)
+    print("Switching to room: " .. room_name)
+
+    if current_room and rooms[room_name] then
+        print(room_name .. " is now active.")
+        if current_room.deactive then
+            current_room:deactive()
+        end
+        current_room = rooms[room_name]
+        if current_room.active then
+            current_room:active()
+        end
+    else
+        current_room = addRoom(room_type, room_name, args)
+        print("Created and switched to new room: " .. current_room.name)
     end
 end
