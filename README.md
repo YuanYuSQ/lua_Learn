@@ -620,7 +620,15 @@ function random(min, max)
     end
 end
 ```
-<video controls src="README_ASSET/compressO-圆形转场2.0.mp4" title="Title"></video>
+<video 
+  src="README_ASSET/compressO-圆形转场2.0.mp4"  
+  width="800"      
+  height="450"       
+  controls         
+  autoplay="false"   
+  loop="false"      
+  muted="false" >
+</video>
 
 为`Area`添加启用判断,利于持久化`room`
 ```lua
