@@ -25,11 +25,14 @@ function love.load()
     addRoom("Stage", "Stage")
     addRoom("room", "circle_room", { side = "circle" })
     addRoom("room", "square_room", { side = 4 })
+    addRoom('RectangleFade',"RectangleFade")
+    input:bind("d","del Rect")
     input:bind("f1", "select CircleRoom")
     input:bind("f2", "select SquareRoom")
     input:bind("f3","select Stage")
+    input:bind("f4",'select RectangleFade')
     current_room = rooms["Stage"]
- --   current_room:active()
+    current_room:active()
 
 
 end
@@ -57,6 +60,9 @@ function love.update(dt)
 
      if input:pressed("select Stage") then
         gotoRoom("Stage", "Stage")
+    end
+    if input:pressed("select RectangleFade") then
+        gotoRoom("RectangleFade", "RectangleFade")
     end
 
     if current_room then
@@ -104,16 +110,19 @@ function recursiveEnumerate(folder, file_list)  -- 递归枚举文件夹中的�
 end
 
 function requireFiles(files) --批量require文件
-    
+
     for _, file in ipairs(files) do
         local className = file:match("([^/]+)%.lua$")
-      --  print(className)
-
         local file = file:sub(1, -5)
-        _G[className] = require(file)
-        
-         --require(file)
-        
+        local res = require(file)
+        if type(res) == "table" then
+            -- Export all keys from the module into the global namespace
+            for k, v in pairs(res) do _G[k] = v end
+            -- Also keep the module table available under its filename
+            _G[className] = res
+        else
+            _G[className] = res
+        end
     end
 end
 

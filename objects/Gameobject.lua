@@ -5,7 +5,6 @@ GameObject = class:extend()
 function GameObject:new(area, x, y, opts)
 
     if type(opts) == "table" then for k, v in pairs(opts) do self[k] = v end end
-
     self.area = area
     self.x, self.y = x, y
     self.id = uuid()
@@ -80,4 +79,38 @@ function drawCenteredRect(mode, cx, cy, w, h, angle)
     love.graphics.pop()
 end
 
-return { GameObject = GameObject, CircleFade = CircleFade }
+
+
+Rectangle = GameObject:extend()
+
+function Rectangle :new(area,opts)
+    Rectangle.super.new(self,area,x,y,opts)
+    self.sidex= random(self.sidex) or random(100)
+    self.sidey=random(self.sidey) or random(100)
+    wx = love.graphics.getWidth()
+    wy = love.graphics.getHeight()
+    self.x=random(wx)
+    self.y=random(wy)
+end 
+
+function Rectangle:update()
+    
+end
+
+function Rectangle:draw()
+    love.graphics.rectangle("fill",self.x,self.y,self.sidex,self.sidey)
+end
+
+
+
+function random(min, max)
+    if not max then -- if max is nil then it means only one value was passed in
+        return love.math.random()*min
+    else
+        if min > max then min, max = max, min end
+        return love.math.random()*(max - min) + min
+    end
+end
+
+
+return { GameObject = GameObject, CircleFade = CircleFade ,Rectangle=Rectangle }

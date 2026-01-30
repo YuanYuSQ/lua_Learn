@@ -1,6 +1,6 @@
 class = require "libraries.classic.classic"
-Area = require"objects.Area".Area
-local room = class:extend() 
+Area = require "objects.Area".Area
+local room = class:extend()
 room.name = nil
 room.type = nil
 room.side = nil
@@ -19,35 +19,37 @@ function room:new(name, args)
 end
 
 function room:update(dt)
-    
+
 end
+
 function room:draw()
-    
+
 end
+
 --- 激活房间
 function room:active()
-    print("Room "..self.name.." is now active.")
+    print("Room " .. self.name .. " is now active.")
     self.active = true
 end
 
 --- 取消激活
 function room:deactive()
-    print("Room "..self.name.." is now deactive.")
+    print("Room " .. self.name .. " is now deactive.")
     self.active = false
 end
 
 --测试用 绘制形状
-function room:drawShape(mode,side, x, y)
-    self.side=side or self.side
+function room:drawShape(mode, side, x, y)
+    self.side = side or self.side
     if not self.side then
         return
     end
     love.graphics.setColor(1, 1, 1)
-    if type(side)=="string" then
-        side=side
+    if type(side) == "string" then
+        side = side
     else
-        side=tonumber(side)
-         side=math.max(side,3)
+        side = tonumber(side)
+        side = math.max(side, 3)
     end
     -- 计算绘制中心：若未提供 x,y，则使用屏幕中心
     local cx = x
@@ -59,36 +61,32 @@ function room:drawShape(mode,side, x, y)
         cy = sh / 2
     end
 
-    if type(side)~="string" and side<3 then
+    if type(side) ~= "string" and side < 3 then
         return
     else
-        if side==3 then
+        if side == 3 then
             -- 等腰三角形，宽高可调整
             local w, h = 100, 100
-            local x1, y1 = cx, cy - h/2
-            local x2, y2 = cx - w/2, cy + h/2
-            local x3, y3 = cx + w/2, cy + h/2
+            local x1, y1 = cx, cy - h / 2
+            local x2, y2 = cx - w / 2, cy + h / 2
+            local x3, y3 = cx + w / 2, cy + h / 2
             love.graphics.polygon(mode or "line", x1, y1, x2, y2, x3, y3)
-        elseif side==4 then
+        elseif side == 4 then
             local w, h = 50, 50
-            love.graphics.rectangle(mode or "line", cx - w/2, cy - h/2, w, h)
+            love.graphics.rectangle(mode or "line", cx - w / 2, cy - h / 2, w, h)
         end
     end
-    if side=="circle" then
+    if side == "circle" then
         local r = 50
         love.graphics.circle(mode or "line", cx, cy, r)
     end
 end
 
-
- 
 Stage = class:extend()
 
 function Stage:new()
-
     self.area = Area(self)
-     self.timer = Timer()
-    
+    self.timer = Timer()
 end
 
 function Stage:update(dt)
@@ -99,38 +97,73 @@ end
 function Stage:draw()
     self.area:draw()
 end
-function  Stage:active()
+
+function Stage:active()
     self:draw()
     self.area:active()
     print("Stage active")
     self.timer:every(0.005, function()
         self.area:addGameObject('CircleFade', random(0, 800), random(0, 600))
-         self.area:addGameObject('CircleFade', random(0, 800), random(0, 600))
-          self.area:addGameObject('CircleFade', random(0, 800), random(0, 600))
-          self.area:addGameObject('CircleFade', random(0, 800), random(0, 600))
+        self.area:addGameObject('CircleFade', random(0, 800), random(0, 600))
+        self.area:addGameObject('CircleFade', random(0, 800), random(0, 600))
+        self.area:addGameObject('CircleFade', random(0, 800), random(0, 600))
     end, 1000)
-  
 
 
-self.timer:after(0.7, function () self.area:addGameObject("CircleFade",wx/2,wy/2,{side = wx})
-    
-end)
+
+    self.timer:after(0.7, function()
+        self.area:addGameObject("CircleFade", wx / 2, wy / 2, { side = wx })
+    end)
 end
 
 function Stage:deactive()
     self.area:deactive()
-    self.area.game_objects={}
+    self.area.game_objects = {}
+end
+
+RectangleFade = class:extend()
+
+function RectangleFade:new()
+    self.area = Area(self)
+    self.timer = Timer()
+end
+
+function RectangleFade:update(dt)
+    self.area:update(dt)
+    self.timer:update(dt)
+    
+    while #self.area.game_objects == 0 do
+        for i = 0, 9 do self.area:addGameObject("Rectangle") end
+    end
+    if input:pressed('del Rect') then
+        table.remove(self.area.game_objects,1)
+    end
+
+    
+end
+
+function RectangleFade:draw()
+ self.area:draw()
+end
+
+function RectangleFade:active()
+self.area:active()
+
+
+end
+
+function RectangleFade:deactive()
+self.area:deactive()
 end
 
 function random(min, max)
-    if not max then -- if max is nil then it means only one value was passed in
-        return love.math.random()*min
+    if min == nil then return nil end
+    if max == nil then -- if max is nil then it means only one value was passed in
+        return love.math.random() * min
     else
         if min > max then min, max = max, min end
-        return love.math.random()*(max - min) + min
+        return love.math.random() * (max - min) + min
     end
 end
 
-
-
-return{room=room,Stage =Stage}
+return { room = room, Stage = Stage , RectangleFade =RectangleFade}
