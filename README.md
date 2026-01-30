@@ -293,10 +293,7 @@ end
 ![美化前](README_ASSET/cmd1.0.png)
 
 - 美化后
-![美化后](README_ASSET/cmd2.0.png)
-- 精简版
-
-![精简版](README_ASSET/cmd3.0.png)
+![美化后](README_ASSET/cmd3.0.png)
 
 
 ---
@@ -655,3 +652,18 @@ function Area:addGameObject(game_object_type, x, y, opts)
     return game_object
 end
 ```
+
+
+---
+
+#### 2026/1/27~29
+
+Claude制作微信小程序
+
+---
+
+
+#### 2026/1/30
+
+
+---
