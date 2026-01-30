@@ -3,12 +3,12 @@ Timer = require "libraries.hump.timer"
 Input = require "libraries.input.Input"
 --obj = require "objects" -- 引入 objects.lua 文件
 function love.load()
-    love.math.setRandomSeed(os.time())  -- 设置随机种子
+    love.math.setRandomSeed(os.time()) -- 设置随机种子
     --自动加载 objects 文件夹下的所有类
 
 
-    love.window.setMode(800, 600)  -- 可替换为你想要的窗口尺寸
-    
+    love.window.setMode(800, 600) -- 可替换为你想要的窗口尺寸
+
     local object_files = {}
     object_files = recursiveEnumerate("objects", object_files)
     requireFiles(object_files)
@@ -18,25 +18,20 @@ function love.load()
     GameObject = _G["GameObject"] --确保全局可访问GameObject类
     input = Input()
     timer = Timer()
-    area=Area.Area
-    room=Room.room
+    area = Area.Area
+    room = Room.room
     rooms = {}
     current_room = nil
-    addRoom("Stage", "Stage")
-    addRoom("room", "circle_room", { side = "circle" })
-    addRoom("room", "square_room", { side = 4 })
-    addRoom('RectangleFade',"RectangleFade")
-    input:bind("d","del Rect")
-    input:bind("f1", "select CircleRoom")
-    input:bind("f2", "select SquareRoom")
-    input:bind("f3","select Stage")
-    input:bind("f4",'select RectangleFade')
-    current_room = rooms["Stage"]
+    addRoom("CircleFadeRoom", "CircleFade")
+    addRoom("CircleRandom", "CircleRandom")
+    addRoom('RectangleFade', "RectangleFade")
+
+    input:bind("f1", "select CircleRandom")
+    input:bind("f2", "select CircleFade")
+    input:bind("f3", 'select RectangleFade')
+    current_room = rooms["CircleFade"]
     current_room:active()
-
-
 end
-
 
 function random(min, max)
     if not max then -- if max is nil then it means only one value was passed in
@@ -50,16 +45,13 @@ end
 function love.update(dt)
     timer:update(dt)
 
-    if input:pressed("select CircleRoom") then
-        print("Switching to CircleRoom")
-        gotoRoom("room", "circle_room")
-    end
-    if input:pressed("select SquareRoom") then
-        gotoRoom("room", "square_room")
+    if input:pressed("select CircleRandom") then
+        print("Switching to CircleRandom")
+        gotoRoom("CircleRandom", "CircleRandom")
     end
 
-     if input:pressed("select Stage") then
-        gotoRoom("Stage", "Stage")
+    if input:pressed("select CircleFade") then
+        gotoRoom("CircleFade", "CircleFade")
     end
     if input:pressed("select RectangleFade") then
         gotoRoom("RectangleFade", "RectangleFade")
@@ -71,17 +63,16 @@ function love.update(dt)
 end
 
 function love.draw()
-    
     if current_room then
         current_room:draw()
     end
 end
 
-function recursiveEnumerate(folder, file_list)  -- 递归枚举文件夹中的所有文件
+function recursiveEnumerate(folder, file_list) -- 递归枚举文件夹中的所有文件
     -- 容错：确保 file_list 是有效表（避免传入 nil 导致报错）
     file_list = file_list or {}
     -- 容错：确保 folder 路径合法（首尾无多余斜杠）
-    folder = folder:gsub("/+$", "")  
+    folder = folder:gsub("/+$", "")
 
     -- 获取文件夹下的所有项（文件/子文件夹）
     local items = love.filesystem.getDirectoryItems(folder)
@@ -103,14 +94,13 @@ function recursiveEnumerate(folder, file_list)  -- 递归枚举文件夹中的�
             recursiveEnumerate(file_path, file_list)
         end
 
-        ::continue::  -- Lua 标签，用于跳过无效项
+        ::continue:: -- Lua 标签，用于跳过无效项
     end
 
-    return file_list  -- 返回结果（方便调用时直接获取）
+    return file_list -- 返回结果（方便调用时直接获取）
 end
 
 function requireFiles(files) --批量require文件
-
     for _, file in ipairs(files) do
         local className = file:match("([^/]+)%.lua$")
         local file = file:sub(1, -5)

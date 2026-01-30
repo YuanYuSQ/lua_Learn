@@ -23,7 +23,7 @@ function room:update(dt)
 end
 
 function room:draw()
-
+ room:drawShape()
 end
 
 --- 激活房间
@@ -40,7 +40,11 @@ end
 
 --测试用 绘制形状
 function room:drawShape(mode, side, x, y)
+    self.mode=mode or "fill"
     self.side = side or self.side
+    self.x =x or 100
+    self.y = y or 100
+
     if not self.side then
         return
     end
@@ -73,32 +77,32 @@ function room:drawShape(mode, side, x, y)
             love.graphics.polygon(mode or "line", x1, y1, x2, y2, x3, y3)
         elseif side == 4 then
             local w, h = 50, 50
-            love.graphics.rectangle(mode or "line", cx - w / 2, cy - h / 2, w, h)
+            love.graphics.rectangle(self.mode or "line", cx - w / 2, cy - h / 2, w, h)
         end
     end
     if side == "circle" then
         local r = 50
-        love.graphics.circle(mode or "line", cx, cy, r)
+        love.graphics.circle(self.mode or "line", cx, cy, r)
     end
 end
 
-Stage = class:extend()
+CircleFadeRoom = class:extend()
 
-function Stage:new()
+function CircleFadeRoom:new()
     self.area = Area(self)
     self.timer = Timer()
 end
 
-function Stage:update(dt)
+function CircleFadeRoom:update(dt)
     self.area:update(dt)
     self.timer:update(dt)
 end
 
-function Stage:draw()
+function CircleFadeRoom:draw()
     self.area:draw()
 end
 
-function Stage:active()
+function CircleFadeRoom:active()
     self:draw()
     self.area:active()
     print("Stage active")
@@ -116,14 +120,18 @@ function Stage:active()
     end)
 end
 
-function Stage:deactive()
+function CircleFadeRoom:deactive()
     self.area:deactive()
     self.area.game_objects = {}
 end
 
+
+
+--随机矩形生成,按'd'删除单个矩形,循环生成10个
 RectangleFade = class:extend()
 
 function RectangleFade:new()
+    input:bind("d", "del Rect")
     self.area = Area(self)
     self.timer = Timer()
 end
@@ -131,30 +139,57 @@ end
 function RectangleFade:update(dt)
     self.area:update(dt)
     self.timer:update(dt)
-    
+
     while #self.area.game_objects == 0 do
         for i = 0, 9 do self.area:addGameObject("Rectangle") end
     end
     if input:pressed('del Rect') then
-        table.remove(self.area.game_objects,1)
+        table.remove(self.area.game_objects, love.math.random(1, #self.are.game_objects))
     end
-
-    
 end
 
 function RectangleFade:draw()
- self.area:draw()
+    self.area:draw()
 end
 
 function RectangleFade:active()
-self.area:active()
-
-
+    self.area:active()
 end
 
 function RectangleFade:deactive()
-self.area:deactive()
+    self.area:deactive()
 end
+
+
+
+
+--随机循环圆形生成
+CircleRandom = class:extend()
+
+function CircleRandom:new()
+       wx = love.graphics.getWidth()
+    wy = love.graphics.getHeight()
+    self.timer = Timer()
+    self.area = Area(self)
+end
+function CircleRandom:update(dt)
+    timer:update(dt)
+    self.area:update(dt)
+    self.area:addGameObject('CircleFade',random(wx),random(wy))
+end
+
+function CircleRandom:draw()
+    self.area:draw()
+end
+
+function CircleRandom:active()
+    self.area:active()
+end
+
+function CircleRandom:deactive()
+    self.area:deactive()
+end
+
 
 function random(min, max)
     if min == nil then return nil end
@@ -166,4 +201,4 @@ function random(min, max)
     end
 end
 
-return { room = room, Stage = Stage , RectangleFade =RectangleFade}
+return { room = room, CircleFadeRoom = CircleFadeRoom, RectangleFade = RectangleFade }

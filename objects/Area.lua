@@ -71,6 +71,19 @@ end  )
 ]]
 
 
+--接收一个 x 、 y 位置坐标，一个 radius 以及包含目标类名称的字符串列表。
+--然后返回以 x, y 位置为中心、半径为 radius 的圆形区域内属于这些类的所有对象。
+-- objects = area:queryCircleArea(100, 100, 50, {'Enemy', 'Projectile'})  
+function Area:queryCircleArea(x,y,radius)
+    local out={}
+    self:getGameObjects(function (e)
+       if  getDistance(e,x,y)<radius then
+        return true
+       end
+    end)
+end
+
+
 function Area:addGameObject(game_object_type, x, y, opts)
     local opts = opts or {}
     -- Resolve constructor: it might be a global or a key inside a module table
@@ -93,5 +106,60 @@ function Area:addGameObject(game_object_type, x, y, opts)
     return game_object
 end
 
+function getDistance(...)
+    local args = {...}  -- 接收可变参数，转为局部参数表（避免污染全局）
+    local x1, y1, x2, y2  -- 最终要提取的两个点的坐标
+
+    -- 辅助校验函数：判断一个对象是否包含有效的 x、y 坐标（数字类型）
+    local function isValidPointObj(obj)
+        return type(obj) == "table" 
+            and type(obj.x) == "number" 
+            and type(obj.y) == "number"
+    end
+
+    -- 分支1：参数形式 → x1, y1, x2, y2（4个数值参数）
+    if #args == 4 then
+        local a, b, c, d = args[1], args[2], args[3], args[4]
+        -- 校验四个参数是否都是数字
+        if type(a) == "number" and type(b) == "number" and type(c) == "number" and type(d) == "number" then
+            x1, y1, x2, y2 = a, b, c, d
+        else
+            return nil, "错误：4个参数必须全为数字（对应 x1,y1,x2,y2）"
+        end
+
+    -- 分支2：参数形式 → obj1, obj2（2个带x/y的对象）
+    elseif #args == 2 then
+        local obj1, obj2 = args[1], args[2]
+        -- 校验两个对象是否都包含有效 x、y 坐标
+        if isValidPointObj(obj1) and isValidPointObj(obj2) then
+            x1, y1 = obj1.x, obj1.y
+            x2, y2 = obj2.x, obj2.y
+        else
+            return nil, "错误：2个参数必须都是带 x、y 数字属性的对象"
+        end
+
+    -- 分支3：参数形式 → obj, x, y（1个对象 + 2个数值）
+    elseif #args == 3 then
+        local obj, a, b = args[1], args[2], args[3]
+        -- 校验对象有效，且后两个参数是数字
+        if isValidPointObj(obj) and type(a) == "number" and type(b) == "number" then
+            x1, y1 = obj.x, obj.y
+            x2, y2 = a, b
+        else
+            return nil, "错误：3个参数必须是「带x/y的对象 + 两个数字」（对应 obj,x,y）"
+        end
+
+    -- 无效参数个数
+    else
+        return nil, "错误：不支持的参数个数，仅支持 2/3/4 个参数"
+    end
+
+    -- 核心：计算欧几里得距离
+    local dx = x2 - x1  -- x 轴差值
+    local dy = y2 - y1  -- y 轴差值
+    local distance = math.sqrt(dx * dx + dy * dy)  -- 平方和开根号
+
+    return distance  -- 返回计算结果
+end
 
 return {Area =Area}
