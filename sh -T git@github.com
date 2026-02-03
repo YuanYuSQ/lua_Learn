@@ -1,0 +1,11 @@
+user.name=YuanYuSQ
+user.email=ccw4393@gmail.com
+credrntial.hrlper=store
+https.proxy=http://127.0.0.1:7897
+core.editor="C:\Users\A\AppData\Local\Programs\Microsoft VS Code\bin\code" --wait
+credential.helper=store
+http.proxy=http://127.0.0.1:7897
+filter.lfs.process=git-lfs filter-process
+filter.lfs.required=true
+filter.lfs.clean=git-lfs clean -- %f
+filter.lfs.smudge=git-lfs smudge -- %f
