@@ -141,8 +141,10 @@ RectangleFade = class:extend()
 
 function RectangleFade:new()
     input:bind("d", "del Rect")
+    input:bind("mouse1","mouse1")
     self.area = Area(self)
     self.t = Timer:new()
+  
 end
 
 function RectangleFade:update(dt)
@@ -150,10 +152,22 @@ function RectangleFade:update(dt)
     self.t:update(dt)
 
     while #self.area.game_objects == 0 do
-        for i = 0, 9 do self.area:addGameObject("Rectangle") end
+        for i = 0, 9 do self.area:addGameObject("Rectangle",{class= "testClass"}) end
     end
     if input:pressed('del Rect') then
         table.remove(self.area.game_objects, love.math.random(1, #self.area.game_objects))
+    end
+
+      if input:pressed("mouse1") then
+        print("mouse1 pressed")
+        inCircleAreaObjects = self.area:getMouseClosestGameobject(1000,{"testClass"})
+        if #inCircleAreaObjects >1 then
+            print("inCircleAreaObjects")
+            for _,  value in ipairs(inCircleAreaObjects) do  
+            print(value)
+        end
+        end
+        
     end
 end
 

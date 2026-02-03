@@ -179,7 +179,7 @@ timer.update(dt)
 
 ---
 
-#### 2026/1/29
+#### 2026/1/19
 
 - 重构了`HPrect`
 
@@ -278,10 +278,10 @@ end
 研究游戏的结构性代码,比较抽象,并非实际的应用层函数
 
 - room
-
+类似unity中的`Scene`,游戏将在各个场景中切换,例如`主菜单`,`初始大厅`,`实际游戏场景`
 - area
+一个`Scene`下的区域,并非传统的武器攻击`范围`,这里的`area`跟接近于全局掌管这个`room`所有游戏对象,类似在这个`Scene`下的次级`Scene`,例如在`Stage`这个room,物理世界引擎将挂载在`FightRoom.area`,一个`room`一般只有一个`area`也可以不用`area`
 
-2,1补
 
 ---
 
@@ -665,5 +665,112 @@ Claude制作微信小程序
 
 #### 2026/1/30
 `Area`与`room`的练习
+
+---
+#### 2026/1/31
+
+`Timer`
+调用`Timer`要注意及时销毁`handle`,来回激活`room`之前调用的`Timer`的`句柄`会重复调用
+
+```lua
+self.t:after(2.5, function()
+            Loop_every = self.t:every(random(0.5, 1), function()    --Loop_every是被赋值的句柄
+                table.remove(self.area.game_objects, random(1, #self.area.game_objects))
+                if #self.area.game_objects == 0 then
+                    self.t:cancel(Loop_every)
+                    Loop()
+                end
+            end)
+        end)
+```
+---
+
+
+#### 2026/2/1
+`Area`
+新增`function Area:queryCircleArea(x, y, radius, needClass)`,`function getDistance(...)`
+
+```lua
+--接收一个 x 、 y 位置坐标，一个 radius 以及包含目标类名称的字符串列表。
+--然后返回以 x, y 位置为中心、半径为 radius 的圆形区域内属于这些类的所有对象。
+-- objects = area:queryCircleArea(100, 100, 50, {'Enemy', 'Projectile'})
+--needClass,gameobject.class都可以是表的形式
+function Area:queryCircleArea(x, y, radius, needClass)
+...
+end
+```
+
+```lua
+--获取对象的xy,返回距离  重载obj,x1,y1    obj1,obj2   x1,y1,x2,y2
+function getDistance(...)
+end
+```
+---
+
+#### 2026/2/3
+`Area`
+新增`function Area:getClosestGameObject(x,y,radius,needClass,n)`
+```lua
+--与 queryCircleArea函数类似，但只返回最近的或n个对象{对象,距离},n=nil返回最近的一个
+function Area:getClosestGameObject(x,y,radius,needClass,n)
+    local out = {}
+if not needClass then
+    for _, value in ipairs(self.game_objects) do
+       local ds =getDistance(value, x, y)
+        if  ds <= radius then
+            table.insert(out, {value,ds}) -- {{Rect,15},{Rect,20}}
+          --  print("add")
+        end
+    end
+    table.sort(out, function (a, b)
+        return a[2]<b[2]
+    end)
+    if  n==nil then
+        return out[1]
+    end
+    return table.slice(out,1,n)
+end
+
+    for _, value in ipairs(self.game_objects) do
+        local ds =getDistance(value, x, y)
+        if  ds <= radius and checkClass(value,needClass) then
+            table.insert(out, {value,ds})
+       --     print("add")
+        end
+    end
+     table.sort(out, function (a, b)
+        return a[2]<b[2]
+    end)
+    if  n==nil then
+        return out[1]
+    end
+    return table.slice(out,1,n)
+end
+```
+重构`function Area:queryCircleArea(x, y, radius, needClass)`,将`checkClass()`独立封装出来
+
+```lua
+
+function Area:queryCircleArea(x, y, radius, needClass)
+    local out = {}
+if not needClass then
+    for _, value in ipairs(self.game_objects) do
+        if getDistance(value, x, y) <= radius then
+            table.insert(out, value)
+            print("add")
+        end
+    end
+    return out
+end
+    for _, value in ipairs(self.game_objects) do
+        if getDistance(value, x, y) <= radius and checkClass(value,needClass) then
+            table.insert(out, value)
+            print("add")
+        end
+    end
+    return out
+end
+
+```
 
 ---

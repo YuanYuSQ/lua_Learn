@@ -54,6 +54,7 @@ function Area:getGameObjects(checkfunction) --传入检查函数,返回符合标
     return out
 end
 
+
 -- 在 and 运算中，只要有两个变量为真，返回的结果总是第二个变量。
 --这在许多情况下很有用，比如上一个练习中的代码行 if e.hp and e.hp >= 50 then 就是在检查 e.hp 是否存在
 --如果存在则进一步判断该值是否大于 50。如果 e.hp 不存在，结果就是 nil
@@ -95,20 +96,50 @@ function Area:addGameObject(game_object_type, opts)
     return game_object
 end
 
+--返回符合在鼠标一定范围内的游戏对象集合
 function Area:mouseCircleAre(radius, needClass)
     local x, y = love.mouse.getPosition()
-    self:queryCircleArea(x, y, radius, needClass)
+    local out =self:queryCircleArea(x, y, radius, needClass)
+    return out
 end
+
+--返回符合在鼠标一定范围内的按距离排序的游戏对象集合
+function Area:getMouseClosestGameobject(radius, needClass,n)
+    local x, y = love.mouse.getPosition()
+    local out =self:getClosestGameObject(x, y, radius, needClass,n)
+    return out
+end
+
 
 --接收一个 x 、 y 位置坐标，一个 radius 以及包含目标类名称的字符串列表。
 --然后返回以 x, y 位置为中心、半径为 radius 的圆形区域内属于这些类的所有对象。
 -- objects = area:queryCircleArea(100, 100, 50, {'Enemy', 'Projectile'})
---needClass,gameobject都可以是表的形式
+--needClass,gameobject.class都可以是表的形式
+--若needClass=nil 则选取所有类型的对象
 function Area:queryCircleArea(x, y, radius, needClass)
     local out = {}
+if not needClass then
+    for _, value in ipairs(self.game_objects) do
+        if getDistance(value, x, y) <= radius then
+            table.insert(out, value)
+            print("add")
+        end
+    end
+    return out
+end
+    for _, value in ipairs(self.game_objects) do
+        if getDistance(value, x, y) <= radius and checkClass(value,needClass) then
+            table.insert(out, value)
+            print("add")
+        end
+    end
+    return out
+end
 
-    local function checkClass(check_gameobject)
-        if not check_gameobject.class then
+
+--检查Game object的类型是否符合
+function checkClass(check_gameobject,needClass)
+       if not check_gameobject.class then
             return false
         end
 
@@ -141,13 +172,67 @@ function Area:queryCircleArea(x, y, radius, needClass)
         end
     end
 
+
+--与 queryCircleArea函数类似，但只返回最近的或n个对象{对象,距离},n=nil返回最近的一个
+function Area:getClosestGameObject(x,y,radius,needClass,n)
+    local out = {}
+if not needClass then
     for _, value in ipairs(self.game_objects) do
-        if getDistance(value, x, y) <= radius and checkClass(value) then
-            table.insert(out, value)
+       local ds =getDistance(value, x, y)
+        if  ds <= radius then
+            table.insert(out, {value,ds}) -- {{Rect,15},{Rect,20}}
+          --  print("add")
         end
     end
-    return out
+    table.sort(out, function (a, b)
+        return a[2]<b[2]
+    end)
+    if  n==nil then
+        return out[1]
+    end
+    return table.slice(out,1,n)
 end
+
+    for _, value in ipairs(self.game_objects) do
+        local ds =getDistance(value, x, y)
+        if  ds <= radius and checkClass(value,needClass) then
+            table.insert(out, {value,ds})
+       --     print("add")
+        end
+    end
+     table.sort(out, function (a, b)
+        return a[2]<b[2]
+    end)
+    if  n==nil then
+        return out[1]
+    end
+    return table.slice(out,1,n)
+end
+
+
+-- 封装通用表格截取函数
+-- 参数：original - 原表格；start - 起始索引；ending - 结束索引
+-- 返回：截取后的新表格
+function table.slice(original, start, ending)
+    local subTable = {}
+    -- 处理边界情况：确保索引在有效范围内
+    local len = #original  -- 获取原表格长度
+    local s = math.max(1, start or 1)  -- 起始索引默认 1，最小为 1
+    local e = math.min(len, ending or len)  -- 结束索引默认表格长度，最大为表格长度
+
+    -- 若起始索引 > 结束索引，返回空表格
+    if s > e then
+        return subTable
+    end
+
+    -- 遍历截取并赋值
+    for i = s, e do
+        table.insert(subTable, original[i])
+    end
+
+    return subTable
+end
+
 
 --获取对象的xy,返回距离  重载obj,x1,y1    obj1,obj2   x1,y1,x2,y2
 function getDistance(...)
